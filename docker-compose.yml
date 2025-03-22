@@ -3,6 +3,8 @@ services:
     image: postgres:15
     container_name: db
     restart: always
+    networks:
+      - my_network
     env_file:
       - ${MODE}.env
     environment:
@@ -11,7 +13,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres", "-d", "claim"]
       interval: 30s
@@ -19,12 +20,17 @@ services:
       start_period: 10s
       timeout: 10s
 
+
   backend:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: django_app
     restart: always
+    networks:
+      - my_network
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
     depends_on:
       db:
         condition: service_healthy
@@ -36,10 +42,11 @@ services:
       - "8000"
     ports:
       - "8000:8000"
-#    volumes:
-#      - .:/app
-#    working_dir: /app
-
+    volumes:
+      - ./src/media:/app/src/media  # ✅ 로컬과 도커 내부의 media 디렉토리를 공유
+    entrypoint: sh /app/src/scripts/entrypoint.sh  # 🔄 entrypoint로 교체
+    environment:
+      - CRAWLER_API_URL=http://host.docker.internal:5001
     healthcheck:
       test: ["CMD", "curl", "--silent", "--fail", "http://backend/health"]
       interval: 30s
@@ -51,6 +58,8 @@ services:
     image: nginx:latest
     container_name: nginx
     restart: always
+    networks:
+      - my_network
     depends_on:
       - backend
     ports:
@@ -63,8 +72,15 @@ services:
     image: redis:alpine
     container_name: redis
     restart: always
+    networks:
+      - my_network
     ports:
       - "6379:6379"
 
 volumes:
   postgres_data:
+
+
+networks:
+  my_network:
+    driver: bridge

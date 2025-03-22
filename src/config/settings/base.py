@@ -8,18 +8,25 @@ ALLOWED_HOSTS = [
     "*",
     "localhost",
     "127.0.0.1",
+    "0.0.0.0",
     "backend",
     "django_app",
     "211.188.62.104",
+    "host.docker.internal",
+    "nginx",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:8000",
-    "http://192.168.219.179:8000",
-    "http://192.168.219.179:5173",
+    "http://127.0.0.1:8000",
     "http://211.188.62.104",
     "https://211.188.62.104",
+    "http://localhost:5001",
+    "http://localhost:5000",
+    "http://django_app:8000",
+    "http://backend:8000",
+
 ]
 
 
@@ -78,10 +85,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:8000",
-    "http://192.168.219.179:8000",
-    "http://192.168.219.179:5173",
+    "http://127.0.0.1:8000",
     "http://211.188.62.104",
     "https://211.188.62.104",
+    "http://localhost:5001",
 ]
 
 # 모든 Origin 허용 (개발용)
@@ -168,14 +175,12 @@ LANGUAGE_CODE = "ko-kr"
 TIME_ZONE = "Asia/Seoul"
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -186,6 +191,8 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
@@ -193,10 +200,11 @@ REST_FRAMEWORK = {
     ],
 }
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "BLACKLIST_AFTER_ROTATION": True,
     "ROTATE_REFRESH_TOKENS": True,
+
 }
 
 SPECTACULAR_SETTINGS = {

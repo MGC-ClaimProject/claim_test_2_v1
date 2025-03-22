@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.http import HttpResponse
 
 from config.views import health_check
 from django.conf import settings
@@ -23,10 +24,13 @@ from django.urls import include, path
 from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
                                    SpectacularSwaggerView)
 
+def empty_favicon(request):
+    return HttpResponse(status=204)
+
 base_url = "v1"
 
 urlpatterns = [
-    path("health", health_check),
+    path("health/", health_check),
     path(f"{base_url}/admin/", admin.site.urls),
     path(f"{base_url}/user/", include("users.urls.user_urls")),
     path(f"{base_url}/users/", include("users.urls.users_urls")),
@@ -35,8 +39,10 @@ urlpatterns = [
     path(f"{base_url}/claims/", include("claims.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+
 if settings.DEBUG:
     urlpatterns += [
+        path("favicon.ico", empty_favicon),  # 빈 응답 반환
         path(f"{base_url}/schema/", SpectacularAPIView.as_view(), name="schema"),
         path(
             f"{base_url}/schema/swagger-ui/",
