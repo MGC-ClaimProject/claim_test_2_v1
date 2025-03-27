@@ -100,7 +100,7 @@ celerybeat.pid
 
 *.sage.py
 
-.env
+../.env
 .venv
 env/
 venv/
@@ -202,5 +202,5 @@ kubeconfig.yaml
 
 claim.tar
 
-scripts/*
+../scripts/*
 media/claim_documents/*

@@ -8,7 +8,7 @@ from .base import *
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # .env 파일에 정의된 MODE 값을 읽어오며, 없으면 기본값은 "prod"로 사용합니다.
-mode = os.getenv("MODE", "local")
+mode = os.getenv("MODE", "prod")
 
 # MODE에 따라 해당하는 env 파일을 로드합니다. 예를 들어, MODE가 prod라면 prod.env 파일을 로드합니다.
 ENV = dotenv_values(os.path.join(BASE_DIR, f"{mode}.env"))
@@ -65,9 +65,9 @@ frontend_url = os.getenv("FRONTEND_BASE_URL", "").rstrip("/")
 FRONTEND_CALLBACK_URL = f"{frontend_url}/login/?code="
 
 
-crawler_apr_url = os.getenv("CRAWLER_API_URL", "http://localhost:5000")
+crawler_apr_url = os.getenv("CRAWLER_API_URL", "http://localhost:5001")
 All_CRAWLER_API_URL = f"{crawler_apr_url}/insurance_all_crawler" # 내보험 다보여
 SIMPLE_CRAWLER_API_URL = f"{crawler_apr_url}/insurance_simple_crawler" # 내보험 보여줌
 
-crawler_callback_base_url= os.getenv("CRAWLER_CALLBACK_BASE_URL","http://localhost:8000")
-CRAWLER_CALLBACK_URL = f"{crawler_callback_base_url}/v1/insurances/call_back_crawler/"
+# crawler_callback_base_url= os.getenv("CRAWLER_CALLBACK_BASE_URL","http://localhost:8000")
+# CRAWLER_CALLBACK_URL = f"{crawler_callback_base_url}/v1/insurances/call_back_crawler/"

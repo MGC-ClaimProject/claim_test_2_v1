@@ -16,13 +16,16 @@ Including another URLconf
 """
 from django.http import HttpResponse
 
-from config.views import health_check
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
                                    SpectacularSwaggerView)
+
+from config.views import health_check
+
 
 def empty_favicon(request):
     return HttpResponse(status=204)

@@ -397,54 +397,55 @@ class CrawlerStatusAPIView(APIView):
             for insurance in insurance_list:
                 policy_number = insurance.get("policy_number")
                 if not policy_number:
+                    print("⚠️ policy_number 누락 → 저장 생략")
                     continue
 
-                relation = insurance.get("contract_relation")
-                # 관계에 따른 holder, insured 할당
-                if relation == "계약자/피보험자":
-                    holder_value = member.name
-                    insured_value = member.name
-                elif relation == "보험계약자":
-                    holder_value = member.name
-                    insured_value = None
-                elif relation == "피보험자":
-                    holder_value = None
-                    insured_value = member.name
-                elif relation == "계약자/수익자":
-                    holder_value = member.name
-                    insured_value = None
-                else:
-                    holder_value = None
-                    insured_value = None
+                try:
+                    relation = insurance.get("contract_relation")
 
-                defaults = {
-                    "company": insurance.get("company"),
-                    "type": insurance.get("contract_type"),
-                    "policy_name": insurance.get("policy_name"),
-                    "premium": insurance.get("premium"),
-                    "start_date": insurance.get("start_date"),
-                    "end_date": insurance.get("end_date"),
-                    "payment_term": insurance.get("payment_term"),
-                    "is_renewable": insurance.get("is_renewable", False),
-                    "status": insurance.get("status"),
-                    "contract_relation": insurance.get("contract_relation"),
-                    "branch": insurance.get("branch"),
-                    "phone_number": insurance.get("phone_number"),
-                    "holder": holder_value,
-                    "insured": insured_value,
-                }
+                    # 관계에 따른 holder, insured 설정
+                    if relation == "계약자/피보험자":
+                        holder_value = member.name
+                        insured_value = member.name
+                    elif relation == "보험계약자":
+                        holder_value = member.name
+                        insured_value = None
+                    elif relation == "피보험자":
+                        holder_value = None
+                        insured_value = member.name
+                    elif relation == "계약자/수익자":
+                        holder_value = member.name
+                        insured_value = None
+                    else:
+                        holder_value = None
+                        insured_value = None
 
-                Insurance.objects.update_or_create(
-                    member=member,
-                    policy_number=policy_number,
-                    defaults=defaults
-                )
+                    defaults = {
+                        "company": insurance.get("company"),
+                        "type": insurance.get("contract_type"),
+                        "policy_name": insurance.get("policy_name"),
+                        "premium": insurance.get("premium"),
+                        "start_date": insurance.get("start_date"),
+                        "end_date": insurance.get("end_date"),
+                        "payment_term": insurance.get("payment_term"),
+                        "is_renewable": insurance.get("is_renewable", False),
+                        "status": insurance.get("status"),
+                        "contract_relation": insurance.get("contract_relation"),
+                        "branch": insurance.get("branch"),
+                        "phone_number": insurance.get("phone_number"),
+                        "holder": holder_value,
+                        "insured": insured_value,
+                    }
 
-            # 기존 DB에 저장된 보험 중, result_data에 없는 policy_number 삭제
-            deleted_count, _ = Insurance.objects.filter(member=member) \
-                .exclude(policy_number__in=new_policy_numbers).delete()
+                    Insurance.objects.update_or_create(
+                        member=member,
+                        policy_number=policy_number,
+                        defaults=defaults
+                    )
 
-        print(f"✅ 보험 데이터 업데이트 완료. 삭제된 데이터: {deleted_count}건")
+                except Exception as e:
+                    print(f"❌ 보험 저장 실패 (policy_number={policy_number}): {str(e)}")
+                    continue
 
 # # 📌 JSON 데이터를 읽어 DB에 저장
 # class SaveDataAPIView(APIView):

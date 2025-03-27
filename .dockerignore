@@ -1,4 +1,4 @@
-scripts/
+../scripts/
 src/media/
 .gitignore
 .git
